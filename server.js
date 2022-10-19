@@ -1,50 +1,71 @@
-const chokidar = require("chokidar");
-const fs = require("fs");
+const express = require("express");
+const formidable = require("formidable");
 const fsExtra = require("fs-extra");
 
-const pathToWatch = "./watch-here";
-const watcher = chokidar.watch(pathToWatch);
+const app = express();
+const PORT = 8000;
 
-watcher
-  .on("add", (path) => {
-    console.log(`File ${path} has been added`);
-    // console.log("Now moving the file to universe");
-    // // fs.copyFile();
+function getName(oldName) {
+  console.log("Oldname: " + oldName);
+  const allFiles = fsExtra
+    .readdirSync(
+      "C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\",
+      { withFileTypes: true }
+    )
+    .filter((item) => !item.isDirectory())
+    .map((item) => item.name);
 
-    // const fileExtension = path.split(".").pop();
-    // const fileName = path.split("\\").pop();
-    // fsExtra.move(path, `./universe/${fileName}`, (err) => {
-    //   console.error(err);
-    // });
-  })
-  .on("change", (path) => console.log(`File ${path} has been changed`))
-  .on("unlink", (path) => console.log(`File ${path} has been removed`));
+  console.log("All files = " + allFiles);
+  //TODO: Add Support for file names which contain two extensions such as Karan.docx.pdf
+  if (allFiles.includes(oldName)) {
+    const name = oldName.split(".");
+    oldName = name[0] + "$." + name[name.length - 1];
+    console.log("Checking for newname " + oldName);
+    return getName(oldName);
+  }
+  return oldName;
+}
 
-// More possible events.
-watcher
-  .on("addDir", (path) => {
-    console.log(`Directory ${path} has been added`);
-    setTimeout(() => {
-      if (path != "watch-here") {
-        const name = path.split("\\").pop();
-        console.log(path);
-        console.log(path + "/" + name);
-        fsExtra.move(path, `./universe/${name}`, (err) => {
-          console.error(err);
+app.post("/upload", (req, res) => {
+  const form = new formidable.IncomingForm();
+  form.parse(req, (err, fields, files) => {
+    const oldpath = files.fileupload.filepath;
+    const newpath = `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\${getName(
+      files.fileupload.originalFilename
+    )}`;
+    fsExtra.moveSync(oldpath, newpath, (err) => {
+      if (err) {
+        console.error(err);
+        res.json({
+          message: "Error Occured",
+          error: err,
         });
       }
-    }, 10000);
-  })
-  .on("unlinkDir", (path) => console.log(`Directory ${path} has been removed`))
-  .on("error", (error) => console.log(`Watcher error: ${error}`))
-  .on("ready", () => console.log("Initial scan complete. Ready for changes"))
-  .on("raw", (event, path, details) => {
-    // internal
-    console.log("Raw event info:", event, path, details);
+    });
+    console.log(
+      `ADDED FILE '${
+        files.fileupload.originalFilename
+      }' TO UPLOADS on ${Date.now()}`
+    );
+    res.json({
+      message: "File Uploaded Successfully",
+    });
   });
+});
 
-// 'add', 'addDir' and 'change' events also receive stat() results as second
-// argument when available: https://nodejs.org/api/fs.html#fs_class_fs_stats
-watcher.on("change", (path, stats) => {
-  if (stats) console.log(`File ${path} changed size to ${stats.size}`);
+//TODO: To get the name of the file to download
+//TODO: If whole directory is to be downloaded then use zip and sendFile
+app.get("/download/", (req, res) => {
+  const path =
+    "C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\";
+  const allFiles = fsExtra
+    .readdirSync(path, { withFileTypes: true })
+    .filter((item) => !item.isDirectory())
+    .map((item) => item.name);
+  res.type(allFiles[0].split(".").pop());
+  res.sendFile(path + `${allFiles[0]}`);
+});
+
+app.listen(PORT, () => {
+  console.log("Server started at PORT=" + PORT);
 });
