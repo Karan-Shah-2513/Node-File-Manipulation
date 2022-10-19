@@ -5,6 +5,8 @@
   },
   "dependencies": {
     "chokidar": "^3.5.3",
+    "fs": "^0.0.1-security",
+    "fs-extra": "^10.1.0",
     "nodemon": "^2.0.20"
   }
 }
