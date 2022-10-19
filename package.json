@@ -1,0 +1,10 @@
+{
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "nodemon": "^2.0.20"
+  }
+}
