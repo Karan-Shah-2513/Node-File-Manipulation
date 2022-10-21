@@ -1,6 +1,10 @@
-const express = require("express");
-const formidable = require("formidable");
-const fsExtra = require("fs-extra");
+import express from "express";
+import getFolderStructure from "./utils/getFolderStructure.js";
+import formidable from "formidable";
+import fsExtra from "fs-extra";
+import dotenv from "dotenv";
+import archiver from "archiver";
+dotenv.config();
 const app = express();
 const PORT = 8000;
 
@@ -25,6 +29,7 @@ function getName(oldName) {
   return oldName;
 }
 
+//All Post requests
 app.post("/upload", (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
@@ -61,17 +66,42 @@ app.post("/createDirectory", (req, res) => {
   });
 });
 
+//All GET requests
+//Enter path in Query params
+app.get("/folderStructure", (req, res) => {
+  const path = req.query.path;
+  console.log(`GET ${path} Folder STRUCTURE ON ${new Date()}`);
+  res.json(getFolderStructure(`./${path}`));
+});
+
 //TODO: To get the name of the file to download
 //TODO: If whole directory is to be downloaded then use zip and sendFile
 app.get("/download", (req, res) => {
-  const path =
-    "C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\";
-  const allFiles = fsExtra
-    .readdirSync(path, { withFileTypes: true })
-    .filter((item) => !item.isDirectory())
-    .map((item) => item.name);
-  res.type(allFiles[0].split(".").pop());
-  res.sendFile(path + `${allFiles[0]}`);
+  //enter Filename in query params with key=name and value=filename_with_extension
+  const path = `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\${req.query.name}`;
+  res.type(path.split(".").pop());
+  res.sendFile(path);
+});
+
+//If a folder is to be downloaded zip it and then send file
+app.get("/downloadfolder", (req, res) => {
+  const path = process.env.UPLOAD_PATH + `${req.query.name}`;
+  const archive = archiver("zip", { zlib: { level: 9 } });
+  const stream = fsExtra.createWriteStream(
+    process.env.ROOT_PATH + `zips\\target.zip`
+  );
+  console.log();
+  archive
+    .directory(path, false)
+    .on("error", (err) => console.error(err))
+    .pipe(stream);
+  archive.finalize();
+  stream.on("close", () => {
+    res.type(".zip");
+    res.sendFile(
+      `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\zips\\target.zip`
+    );
+  });
 });
 
 app.listen(PORT, () => {
