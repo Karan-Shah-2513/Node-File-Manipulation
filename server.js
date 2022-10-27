@@ -8,11 +8,11 @@ dotenv.config();
 const app = express();
 const PORT = 8000;
 
-function getName(oldName) {
+function getName(oldName, directory) {
   console.log("Oldname: " + oldName);
   const allFiles = fsExtra
     .readdirSync(
-      "C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\",
+      `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\${directory}`,
       { withFileTypes: true, recursive: true }
     )
     .filter((item) => !item.isDirectory())
@@ -24,18 +24,25 @@ function getName(oldName) {
     const name = oldName.split(".");
     oldName = name[0] + "$." + name[name.length - 1];
     console.log("Name Already Exists\nChecking for newname " + oldName + "\n");
-    return getName(oldName);
+    return getName(oldName, directory);
   }
   return oldName;
 }
 
 //All Post requests
+//Upload a file to specific folder
+/** Give the path to that specific directory in query such as
+ * haila\\folder1
+ * haila\\ESE sem 1
+ */
 app.post("/upload", (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
+    const directoryPath = `${fields.path}`;
     const oldpath = files.fileupload.filepath;
     const newpath = `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\${getName(
-      files.fileupload.originalFilename
+      files.fileupload.originalFilename,
+      directoryPath
     )}`;
     fsExtra.moveSync(oldpath, newpath, (err) => {
       if (err) {
@@ -49,7 +56,7 @@ app.post("/upload", (req, res) => {
     console.log(
       `ADDED FILE '${
         files.fileupload.originalFilename
-      }' TO UPLOADS on ${new Date()}`
+      }' TO ${newpath} on ${new Date()}`
     );
     res.json({
       message: "File Uploaded Successfully",
@@ -71,7 +78,7 @@ app.post("/createDirectory", (req, res) => {
 app.get("/folderStructure", (req, res) => {
   const path = req.query.path;
   console.log(`GET ${path} Folder STRUCTURE ON ${new Date()}`);
-  res.json(getFolderStructure(`./${path}`));
+  res.json(getFolderStructure(`./uploads/${path}`));
 });
 
 //TODO: To get the name of the file to download
