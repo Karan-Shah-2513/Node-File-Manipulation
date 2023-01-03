@@ -88,6 +88,7 @@ app.get("/download", (req, res) => {
   const path = `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\${req.query.name}`;
   res.type(path.split(".").pop());
   res.sendFile(path);
+  console.log(`Download File ${path} ON ${new Date()}`);
 });
 
 //If a folder is to be downloaded zip it and then send file
@@ -97,7 +98,6 @@ app.get("/downloadfolder", (req, res) => {
   const stream = fsExtra.createWriteStream(
     process.env.ROOT_PATH + `zips\\target.zip`
   );
-  console.log();
   archive
     .directory(path, false)
     .on("error", (err) => console.error(err))
@@ -108,6 +108,7 @@ app.get("/downloadfolder", (req, res) => {
     res.sendFile(
       `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\zips\\target.zip`
     );
+    console.log(`Downloaded Zipped Folder at ${path} ON ${new Date()}`);
   });
 });
 
