@@ -3,3 +3,5 @@
 /uploads/*
 
 *.env
+
+pocketbase_0.10.4_windows_amd64
