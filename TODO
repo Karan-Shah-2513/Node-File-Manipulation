@@ -1,5 +1,10 @@
-//Backend Authentication
-
+/*
+Backend Authentication
+-Get Email and password
+-Encrypt Password
+-Store Email and password in Pocketbase
+-Authenticate email and password at backend
+*/
 //Add Dropzone backend
 //Checkout webkitdirectory for uploading folders
 //Add Dropzone frontend
