@@ -81,10 +81,9 @@ app.get("/folderStructure", (req, res) => {
   res.json(getFolderStructure(`./uploads/${path}`));
 });
 
-//TODO: To get the name of the file to download
-//TODO: If whole directory is to be downloaded then use zip and sendFile
+//Downloads a file by its path
 app.get("/download", (req, res) => {
-  //enter Filename in query params with key=name and value=filename_with_extension
+  //enter FilePath in query params with key=name and value=filename_with_extension
   const path = `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\${req.query.name}`;
   res.type(path.split(".").pop());
   res.sendFile(path);
