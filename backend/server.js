@@ -8,7 +8,7 @@ import path from "node:path";
 dotenv.config();
 const app = express();
 const PORT = 8000;
-
+//function to handle the case when the file you are uploading already exists
 function getName(oldName, directory) {
   console.log("Oldname: " + oldName);
   const allFiles = fsExtra
