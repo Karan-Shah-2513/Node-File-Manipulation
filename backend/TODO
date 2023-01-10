@@ -1,4 +1,6 @@
 /*
+Add Code to get current directory and then mkdir uploads to handle case when uploads directory does not exist
+
 Backend Authentication
 -Get Email and password
 -Encrypt Password

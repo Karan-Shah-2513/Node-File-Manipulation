@@ -5,9 +5,15 @@ import fsExtra from "fs-extra";
 import dotenv from "dotenv";
 import archiver from "archiver";
 import path from "node:path";
+import { mkdir, mkdirSync } from "node:fs";
 dotenv.config();
 const app = express();
 const PORT = 8000;
+// path.dirname(__filename)
+// mkdirSync(path.join(__dirname, "uploads"));
+// const uploadPath = path.join(__dirname, "uploads");
+// console.log(uploadPath);
+
 //function to handle the case when the file you are uploading already exists
 function getName(oldName, directory) {
   console.log("Oldname: " + oldName);
@@ -41,10 +47,11 @@ app.post("/upload", (req, res) => {
   form.parse(req, (err, fields, files) => {
     const directoryPath = `${fields.path}`;
     const oldpath = files.fileupload.filepath;
-    const newpath = `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\${getName(
-      files.fileupload.originalFilename,
-      directoryPath
-    )}`;
+    const newpath = path.join(__dirname, getName());
+    // const newpath = `C:\\Users\\DELL\\Desktop\\My-space\\VScode-programs\\The-web\\websites\\Node-File-Manipulation\\uploads\\${getName(
+    //   files.fileupload.originalFilename,
+    //   directoryPath
+    // )}`;
     fsExtra.moveSync(oldpath, newpath, (err) => {
       if (err) {
         console.error(err);
