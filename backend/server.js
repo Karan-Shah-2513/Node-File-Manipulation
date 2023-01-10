@@ -4,6 +4,7 @@ import formidable from "formidable";
 import fsExtra from "fs-extra";
 import dotenv from "dotenv";
 import archiver from "archiver";
+import path from "node:path";
 dotenv.config();
 const app = express();
 const PORT = 8000;
