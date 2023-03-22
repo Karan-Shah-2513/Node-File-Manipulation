@@ -1,7 +1,8 @@
 /node_modules
 /zips/*
 /uploads/*
+package-lock.json
 
 *.env
 
-pocketbase_0.10.4_windows_amd64
+/pocketbase*

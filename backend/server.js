@@ -5,14 +5,30 @@ import fsExtra from "fs-extra";
 import dotenv from "dotenv";
 import archiver from "archiver";
 import path from "node:path";
-import { mkdir, mkdirSync } from "node:fs";
+import { mkdir, mkdirSync, readdir } from "node:fs";
 dotenv.config();
 const app = express();
 const PORT = 8000;
-// path.dirname(__filename)
-// mkdirSync(path.join(__dirname, "uploads"));
-// const uploadPath = path.join(__dirname, "uploads");
-// console.log(uploadPath);
+
+const uploadPath = path.join(process.cwd(), "/uploads");
+console.log(uploadPath);
+readdir(process.cwd(), (err, files) => {
+  if (err) {
+    console.log(err);
+  } else {
+    let isUploadsThere = false;
+    files.forEach((file) => {
+      if (file === "uploads") {
+        isUploadsThere = true;
+      }
+    });
+    if (!isUploadsThere) {
+      mkdir(uploadPath, (err) => {
+        console.log("Upload path created");
+      });
+    }
+  }
+});
 
 //function to handle the case when the file you are uploading already exists
 function getName(oldName, directory) {
